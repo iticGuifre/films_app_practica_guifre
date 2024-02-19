@@ -47,8 +47,17 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         return resultat
     
     def totes_pag(self, id=None) -> List[Pelicula]:
-        pass
+        cursor = self._conn.cursor(buffered=True)
+        query = f"select id, titulo, anyo, puntuacion, votos from PELICULA WHERE id > {id} limit 10;"
+        cursor.execute(query)
+        registres = cursor.fetchall()
+        cursor.reset()
+        resultat = []
+        for registre in registres:
+            pelicula = Pelicula(registre[1],registre[2],registre[3],registre[4],self,registre[0])
+            resultat.append(pelicula)
         #falta codi
+        print(resultat)
     
     def desa(self,pelicula:Pelicula) -> Pelicula:
         pass
