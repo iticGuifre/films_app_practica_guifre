@@ -57,7 +57,7 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             pelicula = Pelicula(registre[1],registre[2],registre[3],registre[4],self,registre[0])
             resultat.append(pelicula)
         #falta codi
-        print(resultat)
+        return resultat
     
     def desa(self,pelicula:Pelicula) -> Pelicula:
         pass

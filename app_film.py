@@ -1,8 +1,8 @@
 #!/usr/bin/python3
 
 import os, yaml, sys, time, json
-from persistencia_pelicula_mysql import Persistencia_pelicula_mysql
-from llistapelis import Llistapelis
+import persistencia_pelicula_mysql
+import llistapelis
 import logging
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
@@ -18,12 +18,13 @@ def get_configuracio(ruta_fitxer_configuracio) -> dict:
 def get_persistencies(conf: dict) -> dict:
     credencials = {}
     if conf["base de dades"]["motor"].lower().strip() == "mysql":
+        print("PASSA")
         credencials['host'] = conf["base de dades"]["host"]
         credencials['user'] = conf["base de dades"]["user"]
         credencials['password'] = conf["base de dades"]["password"]
         credencials['database'] = conf["base de dades"]["database"]
         return {
-            'pelicula': Persistencia_pelicula_mysql(credencials)
+            'pelicula': persistencia_pelicula_mysql.IPersistencia_pelicula(credencials)
         }
     else:
         return {
@@ -81,8 +82,8 @@ def procesa_opcio(context):
 def database_read(id:int):
     logging.basicConfig(filename='pelicules.log', encoding='utf-8', level=logging.DEBUG)
     la_meva_configuracio = get_configuracio(RUTA_FITXER_CONFIGURACIO)
-    persistencies = get_persistencies(RUTA_FITXER_CONFIGURACIO)
-    films = Llistapelis(
+    persistencies = get_persistencies(la_meva_configuracio)
+    films = llistapelis.Llistapelis(
         persistencies
     )
     films.llegeix_de_disc(id)
