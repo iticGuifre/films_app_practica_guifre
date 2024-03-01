@@ -1,3 +1,5 @@
+## Tinc la versio final a la branca versioFinal
+
 # 1. Què fan els mètodes get_configuracio i get_persistencies?
 ### get_configuracio s'encarrega de llegir el fitxer que tenim de configuració, get_persistencies s'encarrega de retornar la classe pertinent en funcio del parametre de configuracio de motor gràfic, és a dir et retorna una classe segons la base de dades que utilitzem.
 
