@@ -2,6 +2,7 @@
 
 import os, yaml, sys, time, json
 from persistencia_pelicula_mysql import Persistencia_pelicula_mysql
+from persistencia_pelicula_postgresql import Persistencia_pelicula_postgresql
 from llistapelis import Llistapelis
 import logging
 
@@ -39,7 +40,7 @@ def get_persistencies(conf: dict) -> dict:
         credencials['database'] = conf["base de dades"]["database"]
         print(credencials)
         return {
-            'persistencia': Persistencia_pelicula_mysql(credencials)
+            'persistencia': Persistencia_pelicula_postgresql(credencials)
         }
     else:
         return {
