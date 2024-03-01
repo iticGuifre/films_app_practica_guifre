@@ -1,13 +1,19 @@
 #!/usr/bin/python3
 
 import os, yaml, sys, time, json
-import persistencia_pelicula_mysql
-import llistapelis
+from persistencia_pelicula_mysql import Persistencia_pelicula_mysql
+from llistapelis import Llistapelis
 import logging
 
 THIS_PATH = os.path.dirname(os.path.abspath(__file__))
 RUTA_FITXER_CONFIGURACIO = os.path.join(THIS_PATH, 'configuracio.yml') 
 print(RUTA_FITXER_CONFIGURACIO)
+credencials = {
+    "host": "localhost",
+    "user": "dam_app",
+    "password": "1234",
+    "database": "pelis"
+}
 
 def get_configuracio(ruta_fitxer_configuracio) -> dict:
     config = {}
@@ -18,17 +24,26 @@ def get_configuracio(ruta_fitxer_configuracio) -> dict:
 def get_persistencies(conf: dict) -> dict:
     credencials = {}
     if conf["base de dades"]["motor"].lower().strip() == "mysql":
-        print("PASSA")
         credencials['host'] = conf["base de dades"]["host"]
         credencials['user'] = conf["base de dades"]["user"]
         credencials['password'] = conf["base de dades"]["password"]
         credencials['database'] = conf["base de dades"]["database"]
+        print(credencials)
         return {
-            'pelicula': persistencia_pelicula_mysql.IPersistencia_pelicula(credencials)
+            'persistencia': Persistencia_pelicula_mysql(credencials)
+        }
+    elif conf["base de dades"]["motor"].lower().strip() == "postgresql":
+        credencials['host'] = conf["base de dades"]["host"]
+        credencials['user'] = conf["base de dades"]["user"]
+        credencials['password'] = conf["base de dades"]["password"]
+        credencials['database'] = conf["base de dades"]["database"]
+        print(credencials)
+        return {
+            'persistencia': Persistencia_pelicula_mysql(credencials)
         }
     else:
         return {
-            'pelicula': None
+            'persistencia': None
         }
     
 def mostra_lent(missatge, v=0.05):
@@ -66,6 +81,7 @@ def mostra_seguents(llistapelicula):
 def mostra_menu():
     print("0.- Surt de l'aplicació.")
     print("1.- Mostra les primeres 10 pel·lícules")
+    print("2.- Mostra les primeres 10 pel·lícules amb paginacio")
 
 
 def mostra_menu_next10():
@@ -76,36 +92,42 @@ def mostra_menu_next10():
 def procesa_opcio(context):
     return {
         "0": lambda ctx : mostra_lent("Fins la propera"),
-        "1": lambda ctx : mostra_llista(ctx['llistapelis'])
+        "1": lambda ctx : mostra_llista(ctx['llistapelis']),
+        "2": lambda ctx : ""
     }.get(context["opcio"], lambda ctx : mostra_lent("opcio incorrecta!!!"))(context)
 
 def database_read(id:int):
     logging.basicConfig(filename='pelicules.log', encoding='utf-8', level=logging.DEBUG)
     la_meva_configuracio = get_configuracio(RUTA_FITXER_CONFIGURACIO)
-    persistencies = get_persistencies(la_meva_configuracio)
-    films = llistapelis.Llistapelis(
-        persistencies
+    persistencies = get_persistencies(la_meva_configuracio)['persistencia']
+    films = Llistapelis(
+        persistencia_pelicula=persistencies
     )
     films.llegeix_de_disc(id)
     return films
 
 def bucle_principal(context):
     opcio = None
-    
+    opcioPag = None
+    persistencia = Persistencia_pelicula_mysql(credencials)
     mostra_menu()
 
+    id = 0
     while opcio != '0':
-        opcio = input("Selecciona una opció: ")
+        opcio = input("Torna a inserir un 2 per paginar: ")
         context["opcio"] = opcio
         
+        
         if context["opcio"] == '1':
-            id = None
             films = database_read(id)
             context["llistapelis"] = films
 
         elif context["opcio"] == '2':
-            pass
-            #falta codi
+            mostra_menu_next10() 
+            films = persistencia.totes_pag(id)
+            print(films)
+            id += 10
+
         procesa_opcio(context)
 
         #falta codi

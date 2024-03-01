@@ -1,4 +1,8 @@
+#!/usr/bin/python3
+
 import mysql.connector
+from pelicula import Pelicula
+from persistencia_pelicula_mysql import Persistencia_pelicula_mysql
 mydb = mysql.connector.connect(
     host = "localhost",
     user = "dam_app",
@@ -36,3 +40,18 @@ def show_lines(cursor):
 # cerca_per_camp("TITULO", "Salvat")
 # modificar_pelicula(1705, "Poma", 2025, 10 , 5)
 # cerca_per_camp("ID", 1705)
+credencials = {
+    "host": "localhost",
+    "user": "dam_app",
+    "password": "1234",
+    "database": "pelis"
+}
+
+persistencia = Persistencia_pelicula_mysql(credencials)
+# peli = Pelicula("GOFRE", 2024, 123.456, 99, persitencia)
+peli2 = Pelicula("SALVAT", 2024, 123.456, 99, persistencia)
+# print(persistencia.totes())
+print(persistencia.totes_pag(5))
+# print(persistencia.desa(peli2))
+# print(persistencia.llegeix(1990))
+# print(persistencia.canvia(Pelicula("SALVATGE", 2024, 123.456, 99, persistencia, 1710)))
