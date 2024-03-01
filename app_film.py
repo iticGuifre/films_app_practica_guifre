@@ -81,7 +81,6 @@ def mostra_seguents(llistapelicula):
 def mostra_menu():
     print("0.- Surt de l'aplicació.")
     print("1.- Mostra les primeres 10 pel·lícules")
-    print("2.- Mostra les primeres 10 pel·lícules amb paginacio")
 
 
 def mostra_menu_next10():
@@ -93,7 +92,7 @@ def procesa_opcio(context):
     return {
         "0": lambda ctx : mostra_lent("Fins la propera"),
         "1": lambda ctx : mostra_llista(ctx['llistapelis']),
-        "2": lambda ctx : ""
+        "2": lambda ctx : mostra_llista(ctx['llistapelis'])
     }.get(context["opcio"], lambda ctx : mostra_lent("opcio incorrecta!!!"))(context)
 
 def database_read(id:int):
@@ -108,24 +107,27 @@ def database_read(id:int):
 
 def bucle_principal(context):
     opcio = None
-    opcioPag = None
     persistencia = Persistencia_pelicula_mysql(credencials)
     mostra_menu()
 
     id = 0
+    firstOption = False
     while opcio != '0':
-        opcio = input("Torna a inserir un 2 per paginar: ")
+        if firstOption:
+            mostra_menu_next10() 
+        opcio = input("Introdueix una opció: ")
         context["opcio"] = opcio
         
         
         if context["opcio"] == '1':
+            firstOption = True
             films = database_read(id)
             context["llistapelis"] = films
+            id += 10
 
         elif context["opcio"] == '2':
-            mostra_menu_next10() 
-            films = persistencia.totes_pag(id)
-            print(films)
+            films = database_read(id)
+            context['llistapelis'] = films
             id += 10
 
         procesa_opcio(context)

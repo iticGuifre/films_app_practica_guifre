@@ -38,4 +38,4 @@ class Llistapelis():
 
     def llegeix_de_disc(self,id:int):
         self._pelicules = self.persistencia_pelicula.totes_pag(id)
-        self._ult_id = id + 10 #canviar
+    
